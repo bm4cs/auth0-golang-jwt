@@ -12,6 +12,12 @@ import (
 	jose "gopkg.in/square/go-jose.v2"
 )
 
+const (
+	API_CLIENT_SECRET  = "REPLACE_THIS_VALUE"
+	AUTH0_API_AUDIENCE = "REPLACE_THIS_VALUE"
+	AUTH0_DOMAIN       = "REPLACE_THIS_VALUE"
+)
+
 type Product struct {
 	Id          int
 	Name        string
@@ -42,12 +48,12 @@ func main() {
 
 func authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		secret := []byte("{YOUR-AUTH0-API-SECRET}")
+		secret := []byte(API_CLIENT_SECRET)
 		secretProvider := auth0.NewKeyProvider(secret)
-		audience := []string{"{YOUR-AUTH0-API-AUDIENCE}"}
+		audience := []string{AUTH0_API_AUDIENCE}
 
-		configuration := auth0.NewConfiguration(secretProvider, audience, "https://{YOUR-AUTH0-DOMAIN}.auth0.com/", jose.HS256)
-		validator := auth0.NewValidator(configuration)
+		configuration := auth0.NewConfiguration(secretProvider, audience, AUTH0_DOMAIN, jose.HS256)
+		validator := auth0.NewValidator(configuration, nil)
 
 		token, err := validator.ValidateRequest(r)
 
